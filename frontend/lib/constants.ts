@@ -59,7 +59,7 @@ export const CONNECTORS = {
     name: "Shopify",
     slug: "shopify",
     brandColor: "#96BF48",
-    authType: "oauth" as const,
+    authType: "api_key" as const,
     category: "ecommerce",
     description:
       "Products, orders, inventory, customers, analytics, and collections.",

@@ -17,14 +17,8 @@ export interface ConnectorConfig {
 export const CONNECTOR_CONFIGS: Record<ConnectorSlug, ConnectorConfig> = {
   shopify: {
     ...CONNECTORS.shopify,
-    oauthScopes: [
-      "read_products",
-      "write_products",
-      "read_orders",
-      "read_inventory",
-      "read_customers",
-      "read_analytics",
-    ],
+    apiKeyInstructions:
+      "1. Go to your **Shopify Admin** → **Settings** → **Apps and sales channels**\n2. Click **Develop apps** → **Create an app**\n3. Name it \"cocrew.ai\" → click **Configure Admin API scopes**\n4. Enable: `read_products`, `write_products`, `read_orders`, `read_inventory`, `read_customers`, `read_analytics`\n5. Click **Install app** → Copy the **Admin API access token** (starts with `shpat_`)",
   },
   klaviyo: {
     ...CONNECTORS.klaviyo,

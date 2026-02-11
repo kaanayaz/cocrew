@@ -10,9 +10,12 @@ INSERT INTO connectors (slug, name, description, icon_url, brand_color, auth_typ
 
 ('shopify', 'Shopify',
  'Full access to your Shopify store: products, orders, inventory, customers, analytics, and collections.',
- '/connectors/shopify.svg', '#96BF48', 'oauth',
- ARRAY['read_products', 'write_products', 'read_orders', 'read_inventory', 'write_inventory', 'read_customers', 'read_analytics', 'read_content', 'write_content'],
- 'ecommerce', NULL, NULL, 1),
+ '/connectors/shopify.svg', '#96BF48', 'api_key',
+ NULL,
+ 'ecommerce',
+ E'1. Go to your **Shopify Admin** → **Settings** → **Apps and sales channels**\n2. Click **Develop apps** → **Create an app**\n3. Name it "cocrew.ai" → click **Configure Admin API scopes**\n4. Enable: read_products, write_products, read_orders, read_inventory, read_customers, read_analytics\n5. Click **Install app** → Copy the **Admin API access token** (starts with shpat_)',
+ '[{"name": "access_token", "label": "Admin API Access Token", "placeholder": "shpat_..."}]'::jsonb,
+ 1),
 
 ('klaviyo', 'Klaviyo',
  'Email marketing automation: campaigns, segments, flows, templates, and performance metrics.',
