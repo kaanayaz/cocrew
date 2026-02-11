@@ -12,14 +12,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import type { ConnectorConfig } from "@/lib/connectors/registry";
+import type { ConnectorConfig, ApiKeyField } from "@/lib/connectors/registry";
 
 interface ApiKeyConnectDialogProps {
   connector: ConnectorConfig | null;
   open: boolean;
   onClose: () => void;
-  onConnect: (apiKey: string) => Promise<boolean>;
+  onConnect: (credentials: Record<string, string>) => Promise<boolean>;
 }
+
+const DEFAULT_FIELDS: ApiKeyField[] = [
+  { name: "api_key", label: "API Key", placeholder: "Enter your API key", type: "password" },
+];
 
 export function ApiKeyConnectDialog({
   connector,
@@ -27,31 +31,48 @@ export function ApiKeyConnectDialog({
   onClose,
   onConnect,
 }: ApiKeyConnectDialogProps) {
-  const [apiKey, setApiKey] = useState("");
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<
     "idle" | "testing" | "success" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const fields = connector?.apiKeyFields ?? DEFAULT_FIELDS;
+
+  function updateField(name: string, value: string) {
+    setFieldValues((prev) => ({ ...prev, [name]: value }));
+    setStatus("idle");
+  }
+
+  function allFieldsFilled(): boolean {
+    return fields.every((f) => (fieldValues[f.name] ?? "").trim().length > 0);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!apiKey.trim()) return;
+    if (!allFieldsFilled()) return;
 
     setStatus("testing");
     setErrorMessage("");
 
     try {
-      const success = await onConnect(apiKey.trim());
+      // Build trimmed credentials
+      const credentials: Record<string, string> = {};
+      for (const field of fields) {
+        credentials[field.name] = (fieldValues[field.name] ?? "").trim();
+      }
+
+      const success = await onConnect(credentials);
       if (success) {
         setStatus("success");
         setTimeout(() => {
           onClose();
-          setApiKey("");
+          setFieldValues({});
           setStatus("idle");
         }, 1500);
       } else {
         setStatus("error");
-        setErrorMessage("Invalid API key. Please check and try again.");
+        setErrorMessage("Invalid credentials. Please check and try again.");
       }
     } catch {
       setStatus("error");
@@ -62,37 +83,42 @@ export function ApiKeyConnectDialog({
   if (!connector) return null;
 
   return (
-    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        onClose();
+        setFieldValues({});
+        setStatus("idle");
+      }
+    }}>
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
           <DialogTitle>Connect {connector.name}</DialogTitle>
           <DialogDescription>
-            Enter your API key to connect {connector.name}.
+            Enter your credentials to connect {connector.name}.
           </DialogDescription>
         </DialogHeader>
 
         {/* Instructions */}
         {connector.apiKeyInstructions && (
-          <div className="rounded-lg bg-slate-50 p-3 text-sm text-text-secondary">
+          <div className="rounded-lg bg-slate-50 p-3 text-sm text-text-secondary whitespace-pre-line">
             {connector.apiKeyInstructions}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="apiKey">API Key</Label>
-            <Input
-              id="apiKey"
-              type="password"
-              placeholder="Enter your API key"
-              value={apiKey}
-              onChange={(e) => {
-                setApiKey(e.target.value);
-                setStatus("idle");
-              }}
-              disabled={status === "testing" || status === "success"}
-            />
-          </div>
+          {fields.map((field) => (
+            <div key={field.name} className="space-y-2">
+              <Label htmlFor={field.name}>{field.label}</Label>
+              <Input
+                id={field.name}
+                type={field.type ?? "password"}
+                placeholder={field.placeholder}
+                value={fieldValues[field.name] ?? ""}
+                onChange={(e) => updateField(field.name, e.target.value)}
+                disabled={status === "testing" || status === "success"}
+              />
+            </div>
+          ))}
 
           {/* Status messages */}
           {status === "success" && (
@@ -121,7 +147,7 @@ export function ApiKeyConnectDialog({
             <Button
               type="submit"
               className="flex-1"
-              disabled={!apiKey.trim() || status === "testing" || status === "success"}
+              disabled={!allFieldsFilled() || status === "testing" || status === "success"}
             >
               {status === "testing" ? (
                 <>

@@ -14,7 +14,7 @@ INSERT INTO connectors (slug, name, description, icon_url, brand_color, auth_typ
  NULL,
  'ecommerce',
  E'1. Go to your **Shopify Admin** → **Settings** → **Apps and sales channels**\n2. Click **Develop apps** → **Create an app**\n3. Name it "cocrew.ai" → click **Configure Admin API scopes**\n4. Enable: read_products, write_products, read_orders, read_inventory, read_customers, read_analytics\n5. Click **Install app** → Copy the **Admin API access token** (starts with shpat_)',
- '[{"name": "access_token", "label": "Admin API Access Token", "placeholder": "shpat_..."}]'::jsonb,
+ '[{"name": "store_domain", "label": "Store Domain", "placeholder": "mystore.myshopify.com", "type": "text"}, {"name": "access_token", "label": "Admin API Access Token", "placeholder": "shpat_...", "type": "password"}]'::jsonb,
  1),
 
 ('klaviyo', 'Klaviyo',

@@ -41,10 +41,13 @@ export default function IntegrationsPage() {
     }
   }
 
-  async function handleApiKeyConnect(apiKey: string): Promise<boolean> {
+  async function handleApiKeyConnect(credentials: Record<string, string>): Promise<boolean> {
     // For now, simulate connection success
     // In Phase 11, this will actually call the API to test + store credentials
     if (!apiKeyDialogConnector) return false;
+
+    // Log credentials for debugging (remove in production)
+    console.log(`Connecting ${apiKeyDialogConnector.slug} with:`, Object.keys(credentials));
 
     // Simulate API call delay
     await new Promise((r) => setTimeout(r, 1000));
