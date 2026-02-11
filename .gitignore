@@ -1,0 +1,31 @@
+# Dependencies
+frontend/node_modules/
+worker/__pycache__/
+worker/.venv/
+
+# Next.js
+frontend/.next/
+frontend/out/
+
+# Environment
+frontend/.env.local
+frontend/.env*.local
+worker/.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+*.pyc
+__pycache__/
+*.egg-info/
+
+# Build
+frontend/dist/
